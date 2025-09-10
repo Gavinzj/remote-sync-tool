@@ -37,6 +37,8 @@ show_usage() {
     echo "  $0 pull 180 ${DEFAULT_REMOTE_PATH}/myfile.txt ./"
     echo "  $0 push 21 ./project/ ${DEFAULT_REMOTE_PATH}/project/"
     echo ""
+    echo "Note: For pull operations, the syntax is: pull machine remote_path local_path"
+    echo ""
     echo "Available machines:"
     for machine in "${!TARGET_HOSTS[@]}"; do
         echo "  $machine -> ${TARGET_HOSTS[$machine]}"
@@ -147,6 +149,20 @@ perform_sync() {
     elif [ "$ACTION" = "pull" ]; then
         echo -e "${GREEN}Pulling $REMOTE_PATH from remote to local $LOCAL_PATH...${NC}"
         echo -e "${YELLOW}Connection: $TARGET_USER@$TARGET_HOST → $JUMPER_HOST → Local${NC}"
+        
+        # For pull operations, ensure the local destination directory exists
+        # Only create directory if it's a relative path or in user's home
+        if [ ! -d "$LOCAL_PATH" ]; then
+            # Check if it's a relative path or in user's home directory
+            if [[ "$LOCAL_PATH" == ./* ]] || [[ "$LOCAL_PATH" == ~/* ]] || [[ "$LOCAL_PATH" == "$HOME"/* ]]; then
+                echo -e "${YELLOW}Creating local directory: $LOCAL_PATH${NC}"
+                mkdir -p "$LOCAL_PATH"
+            else
+                echo -e "${YELLOW}Warning: Cannot create directory $LOCAL_PATH (permission denied)${NC}"
+                echo -e "${YELLOW}Please create the directory manually or use a different path${NC}"
+            fi
+        fi
+        
         $RSYNC_CMD -e "$SSH_CMD" "$TARGET_USER@$TARGET_HOST:$REMOTE_PATH" "$LOCAL_PATH"
         if [ $? -eq 0 ]; then
             echo -e "${GREEN}✓ Pull completed successfully!${NC}"
@@ -168,14 +184,28 @@ elif [ $# -eq 4 ]; then
     # Four arguments - perform direct sync with machine
     ACTION=$1
     MACHINE=$2
-    LOCAL_PATH=$3
-    REMOTE_PATH=$4
+    if [ "$ACTION" = "pull" ]; then
+        # For pull: ./sync.sh pull machine remote_path local_path
+        REMOTE_PATH=$3
+        LOCAL_PATH=$4
+    else
+        # For push: ./sync.sh push machine local_path remote_path
+        LOCAL_PATH=$3
+        REMOTE_PATH=$4
+    fi
     perform_sync "$ACTION" "$MACHINE" "$LOCAL_PATH" "$REMOTE_PATH"
 elif [ $# -eq 3 ]; then
     # Three arguments - use default machine
     ACTION=$1
-    LOCAL_PATH=$2
-    REMOTE_PATH=$3
+    if [ "$ACTION" = "pull" ]; then
+        # For pull: ./sync.sh pull remote_path local_path
+        REMOTE_PATH=$2
+        LOCAL_PATH=$3
+    else
+        # For push: ./sync.sh push local_path remote_path
+        LOCAL_PATH=$2
+        REMOTE_PATH=$3
+    fi
     echo -e "${YELLOW}Using default machine: $DEFAULT_TARGET (${TARGET_HOSTS[$DEFAULT_TARGET]})${NC}"
     perform_sync "$ACTION" "$DEFAULT_TARGET" "$LOCAL_PATH" "$REMOTE_PATH"
 else
