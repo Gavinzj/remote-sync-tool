@@ -2,6 +2,20 @@
 
 A portable, configurable file synchronization tool for nested SSH environments. Perfect for editing files locally in your favorite editor (like Cursor) and syncing them to remote machines through jump hosts.
 
+## 📖 Background Story
+
+This tool was born out of a real-world problem: **editing files in a nested SSH + Docker environment**. 
+
+I was working on a project where I needed to:
+1. SSH to a jumper machine (`server`)
+2. SSH through that to a target machine (like `192.168.0.231`)
+3. Work inside a Docker container on the target machine
+4. Edit files using interactive IDE functionalities on my local machine
+
+The challenge? **How do you edit remote files locally when you're 3 layers deep in SSH connections?**
+
+So I built this tool to bridge that gap - it handles the complex SSH routing automatically while giving you the simple `push` and `pull` commands you need to sync files seamlessly.
+
 ## 🚀 Features
 
 - **Nested SSH Support**: Works through jump hosts/bastion servers
