@@ -12,7 +12,7 @@ I was working on a project where I needed to:
 3. Work inside a Docker container on the target machine
 4. Edit files using interactive IDE functionalities on my local machine
 
-The challenge? **How do you edit remote files locally when you're 3 layers deep in SSH connections?**
+The challenge? **How do you edit remote files locally when you're 3 layers deep in SSH connections? (Of course, you can use Jupyter) **
 
 So I built this tool to bridge that gap - it handles the complex SSH routing automatically while giving you the simple `push` and `pull` commands you need to sync files seamlessly.
 
