@@ -47,12 +47,20 @@ Edit `config/sync_config.sh` with your connection details
 
 #### With Machine Selection (Recommended)
 ```bash
-./bin/sync.sh [push|pull] [machine_code] [local_path] [remote_path]
+# For push operations:
+./bin/sync.sh push [machine_code] [local_path] [remote_path]
+
+# For pull operations:
+./bin/sync.sh pull [machine_code] [remote_path] [local_path]
 ```
 
 #### Without Machine Selection (Uses Default)
 ```bash
-./bin/sync.sh [push|pull] [local_path] [remote_path]
+# For push operations:
+./bin/sync.sh push [local_path] [remote_path]
+
+# For pull operations:
+./bin/sync.sh pull [remote_path] [local_path]
 ```
 
 
